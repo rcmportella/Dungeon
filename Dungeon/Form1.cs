@@ -12,18 +12,21 @@ namespace Dungeon
 {
     public partial class Form1 : Form
     {
-        private bool p_gameOver = false;
-        private int p_startTime = 0;
-        private int p_currentTime = 0;
-        public Game game;
-        public Bitmap dragonImage;
-        public Sprite dragonSprite;
-        public Bitmap grass;
-        public int frameCount = 0;
-        public int frameTimer = 0;
-        public float frameRate = 0;
-        public PointF velocity;
-        public int direction = 2;
+        Game game;
+        bool p_gameOver = false;
+        int p_startTime = 0;
+        int p_currentTime = 0;
+        int frameCount = 0;
+        int frameTimer = 0;
+        float frameRate = 0;
+        int score = 0;
+        Sprite dragon;
+        Sprite zombie;
+        Sprite spider;
+        Sprite skeleton;
+        Bitmap grass;
+        Sprite archer;
+        Sprite arrow;
 
         public Form1()
         {
@@ -55,24 +58,13 @@ namespace Dungeon
 
             while (!p_gameOver)
             {
-                //update timer
                 p_currentTime = Environment.TickCount;
-
-                //let gameplay code update
                 Game_Update(p_currentTime - p_startTime);
-                //refresh at 60 FPS
                 if (p_currentTime > p_startTime + 16)
                 {
-                    //update timing
                     p_startTime = p_currentTime;
-
-                    //let gameplay code draw
                     Game_Draw();
-
-                    //give the form some cycles
                     Application.DoEvents();
-
-                    //let the game object update
                     game.Update();
                 }
                 frameCount += 1;
@@ -83,10 +75,10 @@ namespace Dungeon
                     frameCount = 0;
                 }
             }
-
             //free memory and shut down
             Game_End();
             Application.Exit();
+
         }
 
         public void Shutdown()
@@ -96,59 +88,189 @@ namespace Dungeon
 
         public bool Game_Init()
         {
-            this.Text = "Sprite Drawing Demo";
+            this.Text = "Archery Shooting Game";
+
+            //load the grassy background
 //            grass = game.LoadBitmap("grass.bmp");
             grass = Properties.Resources.Tower1;
-//            dragonImage = game.LoadBitmap("dragon.png");
-            dragonImage = Properties.Resources.Actor1;
-            dragonSprite = new Sprite(ref game);
-            dragonSprite.Image = dragonImage;
-            /*
-            dragonSprite.Width = 256;
-            dragonSprite.Height = 256;
-            dragonSprite.Columns = 8;
-            dragonSprite.TotalFrames = 64;
-            dragonSprite.Columns = 8;
-            dragonSprite.TotalFrames = 64;
-            dragonSprite.AnimationRate = 20;
-            */
-            dragonSprite.Width = 48;
-            dragonSprite.Height = 48;
-            dragonSprite.Columns = 8;
-            dragonSprite.TotalFrames = 64;
-            dragonSprite.AnimationRate = 20;
-            dragonSprite.X = 250;
-            dragonSprite.Y = 150;
+            //load the archer
+            archer = new Sprite(ref game);
+//            archer.Image = game.LoadBitmap("archer_attack.png");
+            archer.Images = LoadBitmaps(".\\hunter 96x bitmaps\\shooting ",".bmp");
+            archer.Size = new Size(96, 96);
+            archer.Columns = 8;
+            archer.TotalFrames = 64;
+            archer.AnimationRate = 20;
+            archer.Position = new PointF(360, 500);
+            archer.AnimateDirection = Sprite.AnimateDir.NONE;
+
+            //load the arrow
+            arrow = new Sprite(ref game);
+            //            arrow.Image = game.LoadBitmap("arrow.png");
+            arrow.Image = Properties.Resources.pfeil_mit_schatten0000;
+            arrow.Size = new Size(32, 64);
+            arrow.TotalFrames = 1;
+            arrow.Velocity = new PointF(0, -12.0f);
+            arrow.Alive = false;
+
+            //load the zombie
+            zombie = new Sprite(ref game);
+            zombie.Images = LoadBitmaps(".\\green zombie bitmaps\\walking ", ".bmp");
+//            zombie.Image = game.LoadBitmap("zombie walk.png");
+            zombie.Size = new Size(96, 96);
+            zombie.Columns = 8;
+            zombie.TotalFrames = 64;
+            zombie.Position = new PointF(100, 10);
+            zombie.Velocity = new PointF(-2.0f, 0);
+            zombie.AnimationRate = 10;
+/*
+            //load the spider
+            spider = new Sprite(ref game);
+            spider.Image = game.LoadBitmap("redspiderwalking.png");
+            spider.Size = new Size(96, 96);
+            spider.Columns = 8;
+            spider.TotalFrames = 64;
+            spider.Position = new PointF(500, 80);
+            spider.Velocity = new PointF(3.0f, 0);
+            spider.AnimationRate = 20;
+*/
+
+            //load the dragon
+            dragon = new Sprite(ref game);
+            dragon.Images = LoadBitmaps(".\\T firedragon\\firedragon bitmaps flying\\firedragon fliegt ", ".png");
+            //            dragon.Image = game.LoadBitmap("dragonflying.png");
+            dragon.Size = new Size(128, 128);
+            dragon.Columns = 8;
+            dragon.TotalFrames = 64;
+            dragon.AnimationRate = 20;
+            dragon.Position = new PointF(300, 130);
+            dragon.Velocity = new PointF(-4.0f, 0);
+
+            //load the skeleton
+            skeleton = new Sprite(ref game);
+            skeleton.Images = LoadBitmaps(".\\swordskel bitmaps\\swordskel läuft ", ".bmp");
+//            skeleton.Image = game.LoadBitmap("skeleton_walk.png");
+            skeleton.Size = new Size(96, 96);
+            skeleton.Columns = 8;
+            skeleton.TotalFrames = 64;
+            skeleton.Position = new PointF(400, 190);
+            skeleton.Velocity = new PointF(5.0f, 0);
+            skeleton.AnimationRate = 30;
+
             return true;
         }
 
         //not currently needed
-        public void Game_Update(int time) { }
+        public void Game_Update(int time)
+        {
+            if (arrow.Alive)
+            {
+                /*
+                //see if arrow hit spider
+                if (arrow.IsColliding(ref spider))
+                {
+                    arrow.Alive = false;
+                    score++;
+                    spider.X = 800;
+                }
+                */
+
+                //see if arrow hit dragon
+                if (arrow.IsColliding(ref dragon))
+                {
+                    arrow.Alive = false;
+                    score++;
+                    dragon.X = 800;
+                }
+                //see if arrow hit zombie
+                if (arrow.IsColliding(ref zombie))
+                {
+                    arrow.Alive = false;
+                    score++;
+                    zombie.X = 800;
+                }
+
+                //see if arrow hit skeleton
+                if (arrow.IsColliding(ref skeleton))
+                {
+                    arrow.Alive = false;
+                    score++;
+                    skeleton.X = 800;
+                }
+            }
+        }
 
         public void Game_Draw()
         {
+            int row = 0;
+
             //draw background
             game.DrawBitmap(ref grass, 0, 0, 800, 600);
-            //move the dragon sprite
-            switch (direction)
+
+            //draw the arrow
+            if (arrow.Alive)
             {
-                case 0: velocity = new Point(0, -1); break;
-                case 2: velocity = new Point(1, 0); break;
-                case 4: velocity = new Point(0, 1); break;
-                case 6: velocity = new Point(-1, 0); break;
+                arrow.Y += arrow.Velocity.Y;
+                if (arrow.Y < -32)
+                    arrow.Alive = false;
+                arrow.Draw();
             }
-            dragonSprite.X += velocity.X;
-            dragonSprite.Y += velocity.Y;
-            //animate and draw dragon sprite
-//            dragonSprite.Animate(direction * 8 + 1, direction * 8 + 7);
-            dragonSprite.Animate(1, 3);
-            dragonSprite.Draw();
-            game.Print(0, 0, "Press Arrow Keys to change direction");
+            //draw the archer
+            archer.Animate(10, 19);
+            if (archer.CurrentFrame == 19)
+            {
+                archer.AnimateDirection = Sprite.AnimateDir.NONE;
+                archer.CurrentFrame = 10;
+                arrow.Alive = true;
+                arrow.Position = new PointF(
+                    archer.X + 32, archer.Y);
+            }
+            archer.DrawList();
+
+
+            //draw the zombie
+            zombie.X += zombie.Velocity.X;
+            if (zombie.X < -96) zombie.X = 800;
+            row = 6;
+            zombie.Animate(row * 8 + 1, row * 8 + 7);
+            zombie.DrawList();
+
+            /*
+            //draw the spider
+            spider.X += spider.Velocity.X;
+            if (spider.X > 800) spider.X = -96;
+            row = 2;
+            spider.Animate(row * 8 + 1, row * 8 + 7);
+            spider.DrawList();
+            */
+
+            //draw the skeleton
+            skeleton.X += skeleton.Velocity.X;
+            if (skeleton.X > 800) skeleton.X = -96;
+            row = 2;
+            skeleton.Animate(row * 9 + 1, row * 9 + 8);
+            skeleton.DrawList();
+
+            //draw the dragon
+            dragon.X += dragon.Velocity.X;
+            if (dragon.X < -128) dragon.X = 800;
+            row = 6;
+            dragon.Animate(row * 8 + 1, row * 8 + 7);
+            dragon.DrawList();
+            game.Print(0, 0, "SCORE " + score.ToString());
+
         }
+
         public void Game_End()
         {
-            dragonImage = null;
-            dragonSprite = null;
+            dragon.ImagesDispose();
+            dragon = null;
+            archer.ImagesDispose();
+            archer = null;
+//            spider.Image.Dispose();
+//            spider = null;
+            zombie.ImagesDispose();
+            zombie = null;
             grass = null;
         }
         public void Game_KeyPressed(System.Windows.Forms.Keys key)
@@ -156,11 +278,72 @@ namespace Dungeon
             switch (key)
             {
                 case Keys.Escape: Shutdown(); break;
-                case Keys.Up: direction = 0; break;
-                case Keys.Right: direction = 2; break;
-                case Keys.Down: direction = 4; break;
-                case Keys.Left: direction = 6; break;
+                case Keys.Space:
+                    if (!arrow.Alive)
+                    {
+                        archer.AnimateDirection = Sprite.AnimateDir.FORWARD;
+                        archer.CurrentFrame = 10;
+                    }
+                    break;
+                case Keys.Right: break;
+                case Keys.Down: break;
+                case Keys.Left: break;
             }
+        }
+
+        public List<Bitmap> LoadBitmaps(string path, string imgend)
+        {
+            List<Bitmap> lb = new List<Bitmap>();
+            for(int i = 0; i < 8; i++)
+            {
+                string temp = path + "n000" + Convert.ToString(i) + imgend;
+//                temp = ".\\hunter 96x bitmaps\\Teste.bmp";
+                Bitmap im = new Bitmap(temp);
+                lb.Add(im);
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                string temp = path + "ne000" + Convert.ToString(i) + imgend;
+                Bitmap im = new Bitmap(temp);
+                lb.Add(im);
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                string temp = path + "e000" + Convert.ToString(i) + imgend;
+                Bitmap im = new Bitmap(temp);
+                lb.Add(im);
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                string temp = path + "se000" + Convert.ToString(i) + imgend;
+                Bitmap im = new Bitmap(temp);
+                lb.Add(im);
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                string temp = path + "s000" + Convert.ToString(i) + imgend;
+                Bitmap im = new Bitmap(temp);
+                lb.Add(im);
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                string temp = path + "sw000" + Convert.ToString(i) + imgend;
+                Bitmap im = new Bitmap(temp);
+                lb.Add(im);
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                string temp = path + "w000" + Convert.ToString(i) + imgend;
+                Bitmap im = new Bitmap(temp);
+                lb.Add(im);
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                string temp = path + "nw000" + Convert.ToString(i) + imgend;
+                Bitmap im = new Bitmap(temp);
+                lb.Add(im);
+            }
+            return lb;
         }
     }
 }

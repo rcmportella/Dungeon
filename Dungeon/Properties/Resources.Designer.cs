@@ -73,6 +73,16 @@ namespace Dungeon.Properties {
         /// <summary>
         ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap pfeil_mit_schatten0000 {
+            get {
+                object obj = ResourceManager.GetObject("pfeil_mit_schatten0000", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Consulta um recurso localizado do tipo System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Tower1 {
             get {
                 object obj = ResourceManager.GetObject("Tower1", resourceCulture);

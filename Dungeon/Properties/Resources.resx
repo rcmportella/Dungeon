@@ -121,6 +121,9 @@
   <data name="Actor1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Actor1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="pfeil_mit_schatten0000" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pfeil mit schatten0000.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Tower1" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Tower1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>

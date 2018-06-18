@@ -33,6 +33,7 @@ namespace Dungeon
         private AnimateWrap p_animationWrap;
         private int p_lastTime;
         private int p_animationRate;
+        private List<Bitmap> p_images;
 
         public Sprite(ref Game game)
         {
@@ -49,6 +50,21 @@ namespace Dungeon
             p_animationWrap = AnimateWrap.WRAP;
             p_lastTime = 0;
             p_animationRate = 30;
+            p_images = null;
+        }
+        
+        public void ImagesDispose()
+        {
+            if (p_images!=null)
+            {
+                p_images.Clear();
+                p_images = null;
+            }
+            if (p_bitmap != null)
+            {
+                p_bitmap.Dispose();
+                p_bitmap = null;
+            }
         }
 
         public bool Alive
@@ -61,6 +77,12 @@ namespace Dungeon
         {
             get { return p_bitmap; }
             set { p_bitmap = value; }
+        }
+
+        public List<Bitmap> Images
+        {
+            get { return p_images; }
+            set { p_images = value; }
         }
 
         public PointF Position
@@ -215,6 +237,11 @@ namespace Dungeon
             frame.Height = p_size.Height;
             p_game.Device.DrawImage(p_bitmap, Bounds, frame,
                 GraphicsUnit.Pixel);
+        }
+
+        public void DrawList()
+        {
+            p_game.Device.DrawImage(p_images[p_currentFrame], Bounds);
         }
 
     }
